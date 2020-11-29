@@ -1,62 +1,43 @@
-import Machine from "./slots/Machine";
+import Machine, { MachineState } from "./slots/Machine";
+import SpinButton from "./slots/SpinButton";
+import { routine } from "./Utils";
 
 const { ccclass, property } = cc._decorator;
 
 @ccclass
 export default class GameManager extends cc.Component {
-  @property(cc.Node)
-  machineNode = null;
+  @property({ type: Machine })
+  machine = null;
+
+  @property({ type: SpinButton })
+  spinButton: SpinButton = null;
 
   @property({ type: cc.AudioClip })
   audioClick = null;
 
-  private block = false;
-
-  private result = null;
-
-  private machine: Machine;
-
-  start(): void {
-    this.machine = this.machineNode.getComponent('Machine');
+  start() {
     this.machine.createMachine();
   }
 
-  update(): void {
-    if (this.block && this.result != null) {
-      this.informStop();
-      this.result = null;
-    }
-  }
-
-  click(): void {
+  async click() {
     cc.audioEngine.playEffect(this.audioClick, false);
 
-    if (this.machine.spinning === false) {
-      this.block = false;
-      this.machine.spin();
-      this.requestResult();
-    } else if (!this.block) {
-      this.block = true;
-      this.machine.lock();
-    }
-  }
+    switch (this.machine.state) {
+      case MachineState.Spinning:
+        this.spinButton.interactable(false);
 
-  async requestResult(): Promise<void> {
-    this.result = null;
-    this.result = await this.getAnswer();
+        await this.machine.stop(await this.getAnswer());
+
+        this.spinButton.changeTo('SPIN').interactable(true);
+        break;
+      case MachineState.Stopped:
+        this.machine.spin();
+        this.spinButton.changeTo('STOP');
+        break;
+    }
   }
 
   getAnswer(): Promise<Array<Array<number>>> {
-    const slotResult = [];
-    return new Promise<Array<Array<number>>>(resolve => {
-      setTimeout(() => {
-        resolve(slotResult);
-      }, 1000 + 500 * Math.random());
-    });
-  }
-
-  informStop(): void {
-    const resultRelayed = this.result;
-    this.machine.stop(resultRelayed);
+    return routine(1000 + 500 * Math.random(), () => []);
   }
 }

@@ -1,12 +1,16 @@
 import Aux from '../SlotEnum';
+import { routine } from '../Utils';
+import Reel from './Reel';
 
 const { ccclass, property } = cc._decorator;
 
+export enum MachineState {
+  Stopped,
+  Spinning
+}
+
 @ccclass
 export default class Machine extends cc.Component {
-  @property(cc.Node)
-  public button: cc.Node = null;
-
   @property(cc.Prefab)
   public _reelPrefab = null;
 
@@ -40,9 +44,9 @@ export default class Machine extends cc.Component {
     }
   }
 
-  private reels = [];
+  public state: MachineState = MachineState.Stopped;
 
-  public spinning = false;
+  private reels: Reel[]  = [];
 
   createMachine(): void {
     this.node.destroyAllChildren();
@@ -52,22 +56,21 @@ export default class Machine extends cc.Component {
     for (let i = 0; i < this.numberOfReels; i += 1) {
       newReel = cc.instantiate(this.reelPrefab);
       this.node.addChild(newReel);
-      this.reels[i] = newReel;
 
-      const reelScript = newReel.getComponent('Reel');
+      const reelScript = newReel.getComponent(Reel);
       reelScript.shuffle();
       reelScript.reelAnchor.getComponent(cc.Layout).enabled = false;
+      this.reels[i] = reelScript;
     }
 
     this.node.getComponent(cc.Widget).updateAlignment();
   }
 
   spin(): void {
-    this.spinning = true;
-    this.button.getChildByName('Label').getComponent(cc.Label).string = 'STOP';
+    this.state = MachineState.Spinning;
 
     for (let i = 0; i < this.numberOfReels; i += 1) {
-      const theReel = this.reels[i].getComponent('Reel');
+      const theReel = this.reels[i];
 
       if (i % 2) {
         theReel.spinDirection = Aux.Direction.Down;
@@ -79,25 +82,19 @@ export default class Machine extends cc.Component {
     }
   }
 
-  lock(): void {
-    this.button.getComponent(cc.Button).interactable = false;
-  }
-
-  stop(result: Array<Array<number>> = null): void {
-    setTimeout(() => {
-      this.spinning = false;
-      this.button.getComponent(cc.Button).interactable = true;
-      this.button.getChildByName('Label').getComponent(cc.Label).string = 'SPIN';
-    }, 2500);
-
+  async stop(result: Array<Array<number>> = null) {
+    const routines = [];
     const rngMod = Math.random() / 2;
     for (let i = 0; i < this.numberOfReels; i += 1) {
       const spinDelay = i < 2 + rngMod ? i / 4 : rngMod * (i - 2) + i / 4;
-      const theReel = this.reels[i].getComponent('Reel');
 
-      setTimeout(() => {
-        theReel.readyStop(result[i]);
-      }, spinDelay * 1000);
+      routines.push(
+        routine(spinDelay * 1000, () => this.reels[i].readyStop(result[i]))
+      );
     }
+
+    await Promise.all([...routines, routine(250)]);
+
+    this.state = MachineState.Stopped;
   }
 }
