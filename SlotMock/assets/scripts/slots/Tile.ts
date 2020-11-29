@@ -1,35 +1,20 @@
-const { ccclass, property } = cc._decorator;
+import CharactersResource from "../CharactersResource";
+
+const { ccclass } = cc._decorator;
 
 @ccclass
 export default class Tile extends cc.Component {
-  @property({ type: [cc.SpriteFrame], visible: true })
-  private textures = [];
+  private sprite: cc.Sprite;
 
-  async onLoad(): Promise<void> {
-    await this.loadTextures();
+  start() {
+    this.sprite = this.node.getComponent(cc.Sprite);
   }
 
-  async resetInEditor(): Promise<void> {
-    await this.loadTextures();
-    this.setRandom();
+  setTile(index: number) {
+    this.sprite.spriteFrame = CharactersResource.instance.getAt(index);
   }
 
-  async loadTextures(): Promise<boolean> {
-    const self = this;
-    return new Promise<boolean>(resolve => {
-      cc.loader.loadResDir('gfx/Square', cc.SpriteFrame, function afterLoad(err, loadedTextures) {
-        self.textures = loadedTextures;
-        resolve(true);
-      });
-    });
-  }
-
-  setTile(index: number): void {
-    this.node.getComponent(cc.Sprite).spriteFrame = this.textures[index];
-  }
-
-  setRandom(): void {
-    const randomIndex = Math.floor(Math.random() * this.textures.length);
-    this.setTile(randomIndex);
+  setRandom() {
+    this.sprite.spriteFrame = CharactersResource.instance.getRandom();
   }
 }
