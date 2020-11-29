@@ -5,6 +5,7 @@ const {ccclass, property} = cc._decorator;
 interface ICharactersResource {
   getAt(index: number): cc.SpriteFrame;
   getRandom(): cc.SpriteFrame;
+  getRandomIndex(): number;
 }
 
 @ccclass
@@ -26,10 +27,14 @@ export default class CharactersResource extends cc.Component implements ICharact
   private textures = [];
 
   getRandom() {
-    return this.textures[randomInteger(0, this.textures.length)];
+    return this.textures[this.getRandomIndex()];
   }
   getAt(index: number) {
     return this.textures[index];
+  }
+
+  getRandomIndex() {
+    return randomInteger(0, this.textures.length);
   }
 
   async onLoad() {

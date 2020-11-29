@@ -1,5 +1,5 @@
 import Aux from '../SlotEnum';
-import { routine } from '../Utils';
+import { atomicRoutine } from '../Utils';
 import Reel from './Reel';
 
 const { ccclass, property } = cc._decorator;
@@ -66,6 +66,10 @@ export default class Machine extends cc.Component {
     this.node.getComponent(cc.Widget).updateAlignment();
   }
 
+  getTilesAtLine(lineIndex: number) {
+    return this.reels.map(reel => reel.getTileAt(lineIndex));
+  }
+
   spin(): void {
     this.state = MachineState.Spinning;
 
@@ -89,11 +93,11 @@ export default class Machine extends cc.Component {
       const spinDelay = i < 2 + rngMod ? i / 4 : rngMod * (i - 2) + i / 4;
 
       routines.push(
-        routine(spinDelay * 1000, () => this.reels[i].readyStop(result[i]))
+        atomicRoutine(spinDelay * 1000, () => this.reels[i].readyStop(result[i]))
       );
     }
 
-    await Promise.all([...routines, routine(250)]);
+    await Promise.all([...routines, atomicRoutine(250)]);
 
     this.state = MachineState.Stopped;
   }

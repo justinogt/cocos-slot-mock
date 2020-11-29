@@ -1,4 +1,5 @@
 import Aux from '../SlotEnum';
+import Tile from './Tile';
 
 const { ccclass, property } = cc._decorator;
 
@@ -10,44 +11,23 @@ export default class Reel extends cc.Component {
   @property({ type: cc.Enum(Aux.Direction) })
   public spinDirection = Aux.Direction.Down;
 
-  @property({ type: [cc.Node], visible: false })
-  private tiles = [];
+  public stopSpinning = false;
 
-  @property({ type: cc.Prefab })
-  public _tilePrefab = null;
-
-  @property({ type: cc.Prefab })
-  get tilePrefab(): cc.Prefab {
-    return this._tilePrefab;
-  }
-
-  set tilePrefab(newPrefab: cc.Prefab) {
-    this._tilePrefab = newPrefab;
-    this.reelAnchor.removeAllChildren();
-    this.tiles = [];
-
-    if (newPrefab !== null) {
-      this.createReel();
-      this.shuffle();
-    }
-  }
+  private tiles: Tile[] = [];
 
   private result: Array<number> = [];
 
-  public stopSpinning = false;
+  start() {
+    this.tiles = this.node.getComponentsInChildren<Tile>(Tile);
+  }
 
-  createReel(): void {
-    let newTile: cc.Node;
-    for (let i = 0; i < 5; i += 1) {
-      newTile = cc.instantiate(this.tilePrefab);
-      this.reelAnchor.addChild(newTile);
-      this.tiles[i] = newTile;
-    }
+  getTileAt(lineIndex: number) {
+    return this.tiles[lineIndex];
   }
 
   shuffle(): void {
     for (let i = 0; i < this.tiles.length; i += 1) {
-      this.tiles[i].getComponent('Tile').setRandom();
+      this.tiles[i].setRandom();
     }
   }
 
