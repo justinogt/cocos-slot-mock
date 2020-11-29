@@ -1,9 +1,11 @@
+import Machine from "./slots/Machine";
+
 const { ccclass, property } = cc._decorator;
 
 @ccclass
 export default class GameManager extends cc.Component {
   @property(cc.Node)
-  machine = null;
+  machineNode = null;
 
   @property({ type: cc.AudioClip })
   audioClick = null;
@@ -12,8 +14,11 @@ export default class GameManager extends cc.Component {
 
   private result = null;
 
+  private machine: Machine;
+
   start(): void {
-    this.machine.getComponent('Machine').createMachine();
+    this.machine = this.machineNode.getComponent('Machine');
+    this.machine.createMachine();
   }
 
   update(): void {
@@ -26,13 +31,13 @@ export default class GameManager extends cc.Component {
   click(): void {
     cc.audioEngine.playEffect(this.audioClick, false);
 
-    if (this.machine.getComponent('Machine').spinning === false) {
+    if (this.machine.spinning === false) {
       this.block = false;
-      this.machine.getComponent('Machine').spin();
+      this.machine.spin();
       this.requestResult();
     } else if (!this.block) {
       this.block = true;
-      this.machine.getComponent('Machine').lock();
+      this.machine.lock();
     }
   }
 
@@ -52,6 +57,6 @@ export default class GameManager extends cc.Component {
 
   informStop(): void {
     const resultRelayed = this.result;
-    this.machine.getComponent('Machine').stop(resultRelayed);
+    this.machine.stop(resultRelayed);
   }
 }
