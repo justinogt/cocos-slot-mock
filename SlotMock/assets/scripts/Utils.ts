@@ -1,7 +1,7 @@
 export type RoutineFn<T> = () => T;
 export type RoutineFnLazy = (resolve) => void;
 
-export function atomicRoutine<T = any>(delay: number, fn: RoutineFn<T> = null) {
+export function atomicRoutineDelay<T = any>(delay: number, fn: RoutineFn<T> = null) {
   return new Promise<T>(resolve =>
     setTimeout(() => resolve(fn && fn()), delay)
   );

@@ -1,5 +1,5 @@
 import Aux from '../SlotEnum';
-import { atomicRoutine, lazyRoutineDelay } from '../Utils';
+import { atomicRoutineDelay, lazyRoutineDelay } from '../Utils';
 import Reel from './Reel';
 
 const { ccclass, property } = cc._decorator;
@@ -45,10 +45,9 @@ export default class Machine extends cc.Component {
   }
 
   public state: MachineState = MachineState.Stopped;
-
   public reels: Reel[]  = [];
 
-  createMachine(): void {
+  createMachine() {
     this.node.destroyAllChildren();
     this.reels = [];
 
@@ -65,7 +64,7 @@ export default class Machine extends cc.Component {
     this.node.getComponent(cc.Widget).updateAlignment();
   }
 
-  spin(): void {
+  spin() {
     this.state = MachineState.Spinning;
 
     for (const reel of this.reels) {
@@ -93,11 +92,11 @@ export default class Machine extends cc.Component {
       const spinDelay = i < 2 + rngMod ? i / 4 : rngMod * (i - 2) + i / 4;
 
       routines.push(
-        lazyRoutineDelay(spinDelay * 1000, resolve => this.reels[i].readyStop(result[i], resolve))
+        lazyRoutineDelay(spinDelay * 1000, resolve => this.reels[i].readyToStop(result[i], resolve))
       );
     }
 
-    await Promise.all([...routines, atomicRoutine(250)]);
+    await Promise.all([...routines, atomicRoutineDelay(250)]);
 
     this.state = MachineState.Stopped;
   }

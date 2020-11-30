@@ -12,34 +12,31 @@ export default class Reel extends cc.Component {
   public spinDirection = Aux.Direction.Down;
 
   public stopSpinning = false;
-
   public tiles: Tile[] = [];
-
   public winnerTiles: Tile[] = [];
 
   private result: Array<number> = [];
-
-  private resolveStop = null;
+  private resolveStopped = null;
 
   start() {
     this.tiles = this.node.getComponentsInChildren<Tile>(Tile);
   }
 
-  shuffle(): void {
+  shuffle() {
     for (let i = 0; i < this.tiles.length; i += 1) {
       this.tiles[i].setRandom();
     }
   }
 
-  readyStop(newResult: Array<number>, resolve): void {
+  readyToStop(newResult: Array<number>, resolve) {
     const check = this.spinDirection === Aux.Direction.Down || newResult == null;
     this.result = check ? newResult : newResult.reverse();
     this.stopSpinning = true;
     this.winnerTiles = [];
-    this.resolveStop = resolve;
+    this.resolveStopped = resolve;
   }
 
-  changeCallback(element: cc.Node = null): void {
+  changeCallback(element: cc.Node = null) {
     const el = element;
     const dirModifier = this.spinDirection === Aux.Direction.Down ? -1 : 1;
     if (el.position.y * dirModifier > 288) {
@@ -60,7 +57,7 @@ export default class Reel extends cc.Component {
     }
   }
 
-  checkEndCallback(element: cc.Node = null): void {
+  checkEndCallback(element: cc.Node = null) {
     const el = element;
     if (this.stopSpinning) {
       this.getComponent(cc.AudioSource).play();
@@ -70,7 +67,7 @@ export default class Reel extends cc.Component {
     }
   }
 
-  doSpin(windUp: number): void {
+  doSpin(windUp: number) {
     this.stopSpinning = false;
 
     this.reelAnchor.children.forEach(element => {
@@ -89,7 +86,7 @@ export default class Reel extends cc.Component {
     });
   }
 
-  doSpinning(element: cc.Node = null, times = 1): void {
+  doSpinning(element: cc.Node = null, times = 1) {
     const dirModifier = this.spinDirection === Aux.Direction.Down ? -1 : 1;
 
     const move = cc.tween().by(0.04, { position: cc.v2(0, 144 * dirModifier) });
@@ -100,13 +97,13 @@ export default class Reel extends cc.Component {
     repeat.then(checkEnd).start();
   }
 
-  doStop(element: cc.Node = null): void {
+  doStop(element: cc.Node = null) {
     const dirModifier = this.spinDirection === Aux.Direction.Down ? -1 : 1;
 
     const move = cc.tween(element).by(0.04, { position: cc.v2(0, 144 * dirModifier) });
     const doChange = cc.tween().call(() => this.changeCallback(element));
     const end = cc.tween().by(0.2, { position: cc.v2(0, 144 * dirModifier) }, { easing: 'bounceOut' });
-    const completed = cc.tween().call(() => this.resolveStop());
+    const completed = cc.tween().call(() => this.resolveStopped());
 
     move
       .then(doChange)
