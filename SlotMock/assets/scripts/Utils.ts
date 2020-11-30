@@ -10,6 +10,11 @@ export function atomicRoutine<T = any>(delay: number, fn: RoutineFn<T> = null) {
 export function lazyRoutine<T>(fn: RoutineFnLazy) {
   return new Promise<T>(resolve => fn(resolve));
 }
+export function lazyRoutineDelay<T>(delay: number, fn: RoutineFnLazy) {
+  return new Promise<T>(resolve =>
+    setTimeout(() => fn(resolve), delay)
+  );
+}
 
 /*
 * Min included

@@ -1,5 +1,5 @@
 import Aux from '../SlotEnum';
-import { atomicRoutine } from '../Utils';
+import { atomicRoutine, lazyRoutineDelay } from '../Utils';
 import Reel from './Reel';
 
 const { ccclass, property } = cc._decorator;
@@ -46,15 +46,14 @@ export default class Machine extends cc.Component {
 
   public state: MachineState = MachineState.Stopped;
 
-  private reels: Reel[]  = [];
+  public reels: Reel[]  = [];
 
   createMachine(): void {
     this.node.destroyAllChildren();
     this.reels = [];
 
-    let newReel: cc.Node;
     for (let i = 0; i < this.numberOfReels; i += 1) {
-      newReel = cc.instantiate(this.reelPrefab);
+      const newReel = cc.instantiate(this.reelPrefab);
       this.node.addChild(newReel);
 
       const reelScript = newReel.getComponent(Reel);
@@ -66,12 +65,13 @@ export default class Machine extends cc.Component {
     this.node.getComponent(cc.Widget).updateAlignment();
   }
 
-  getTilesAtLine(lineIndex: number) {
-    return this.reels.map(reel => reel.getTileAt(lineIndex));
-  }
-
   spin(): void {
     this.state = MachineState.Spinning;
+
+    for (const reel of this.reels) {
+      for (const tile of reel.tiles)
+        tile.setNormal();
+    }
 
     for (let i = 0; i < this.numberOfReels; i += 1) {
       const theReel = this.reels[i];
@@ -93,7 +93,7 @@ export default class Machine extends cc.Component {
       const spinDelay = i < 2 + rngMod ? i / 4 : rngMod * (i - 2) + i / 4;
 
       routines.push(
-        atomicRoutine(spinDelay * 1000, () => this.reels[i].readyStop(result[i]))
+        lazyRoutineDelay(spinDelay * 1000, resolve => this.reels[i].readyStop(result[i], resolve))
       );
     }
 

@@ -1,15 +1,16 @@
 import CharactersResource from "../CharactersResource";
 
-const { ccclass } = cc._decorator;
+const { ccclass, property } = cc._decorator;
 
 @ccclass
 export default class Tile extends cc.Component {
+  @property({ type: cc.Node })
+  public glow: cc.Node = null;
+
   private sprite: cc.Sprite;
-  private glow: cc.Node;
 
   start() {
     this.sprite = this.node.getComponent(cc.Sprite);
-    this.glow = this.node.getChildByName('glow');
     this.setRandom();
   }
 
@@ -25,7 +26,6 @@ export default class Tile extends cc.Component {
   }
 
   setRandom() {
-    console.log('dsnadsla');
     this.sprite.spriteFrame = CharactersResource.instance.getRandom();
   }
 }

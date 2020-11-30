@@ -13,16 +13,16 @@ export default class Reel extends cc.Component {
 
   public stopSpinning = false;
 
-  private tiles: Tile[] = [];
+  public tiles: Tile[] = [];
+
+  public winnerTiles: Tile[] = [];
 
   private result: Array<number> = [];
 
+  private resolveStop = null;
+
   start() {
     this.tiles = this.node.getComponentsInChildren<Tile>(Tile);
-  }
-
-  getTileAt(lineIndex: number) {
-    return this.tiles[lineIndex];
   }
 
   shuffle(): void {
@@ -31,10 +31,12 @@ export default class Reel extends cc.Component {
     }
   }
 
-  readyStop(newResult: Array<number>): void {
+  readyStop(newResult: Array<number>, resolve): void {
     const check = this.spinDirection === Aux.Direction.Down || newResult == null;
     this.result = check ? newResult : newResult.reverse();
     this.stopSpinning = true;
+    this.winnerTiles = [];
+    this.resolveStop = resolve;
   }
 
   changeCallback(element: cc.Node = null): void {
@@ -49,7 +51,9 @@ export default class Reel extends cc.Component {
       }
 
       if (pop != null && pop >= 0) {
-        el.getComponent('Tile').setTile(pop);
+        const tile = el.getComponent('Tile');
+        this.winnerTiles.push(tile);
+        tile.setTile(pop);
       } else {
         el.getComponent('Tile').setRandom();
       }
@@ -102,6 +106,7 @@ export default class Reel extends cc.Component {
     const move = cc.tween(element).by(0.04, { position: cc.v2(0, 144 * dirModifier) });
     const doChange = cc.tween().call(() => this.changeCallback(element));
     const end = cc.tween().by(0.2, { position: cc.v2(0, 144 * dirModifier) }, { easing: 'bounceOut' });
+    const completed = cc.tween().call(() => this.resolveStop());
 
     move
       .then(doChange)
@@ -109,6 +114,7 @@ export default class Reel extends cc.Component {
       .then(doChange)
       .then(end)
       .then(doChange)
+      .then(completed)
       .start();
   }
 }

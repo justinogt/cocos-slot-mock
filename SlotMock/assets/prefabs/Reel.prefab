@@ -58,7 +58,7 @@
       "__type__": "TypedArray",
       "ctor": "Float64Array",
       "array": [
-        390,
+        0,
         0,
         0,
         0,
@@ -391,6 +391,9 @@
       "__id__": 3
     },
     "_enabled": true,
+    "glow": {
+      "__id__": 4
+    },
     "_id": ""
   },
   {
@@ -401,7 +404,7 @@
     "asset": {
       "__uuid__": "a75a6cdf-ea63-4dea-af63-4cc3bf7305ac"
     },
-    "fileId": "20iSeE+r1AsqRTXQ2j7G6R",
+    "fileId": "4eQHAZzGJMfIt72cgJqFX9",
     "sync": false
   },
   {
@@ -632,6 +635,9 @@
       "__id__": 10
     },
     "_enabled": true,
+    "glow": {
+      "__id__": 11
+    },
     "_id": ""
   },
   {
@@ -642,7 +648,7 @@
     "asset": {
       "__uuid__": "a75a6cdf-ea63-4dea-af63-4cc3bf7305ac"
     },
-    "fileId": "433SnbMxtP+ZtKv+YAwSBA",
+    "fileId": "1aK3V5XBZCB5qGpLVNz3UG",
     "sync": false
   },
   {
@@ -873,6 +879,9 @@
       "__id__": 17
     },
     "_enabled": true,
+    "glow": {
+      "__id__": 18
+    },
     "_id": ""
   },
   {
@@ -883,7 +892,7 @@
     "asset": {
       "__uuid__": "a75a6cdf-ea63-4dea-af63-4cc3bf7305ac"
     },
-    "fileId": "90sNYMhERHwKCBynvUKgay",
+    "fileId": "145TVIyWdED636VVpCn/QO",
     "sync": false
   },
   {
@@ -1114,6 +1123,9 @@
       "__id__": 24
     },
     "_enabled": true,
+    "glow": {
+      "__id__": 25
+    },
     "_id": ""
   },
   {
@@ -1124,7 +1136,7 @@
     "asset": {
       "__uuid__": "a75a6cdf-ea63-4dea-af63-4cc3bf7305ac"
     },
-    "fileId": "7bPHzggiBGSZQJMnw1Fn0t",
+    "fileId": "ac5kUCT/1MOqWccIYWn7Cl",
     "sync": false
   },
   {
@@ -1355,6 +1367,9 @@
       "__id__": 31
     },
     "_enabled": true,
+    "glow": {
+      "__id__": 32
+    },
     "_id": ""
   },
   {
@@ -1365,7 +1380,7 @@
     "asset": {
       "__uuid__": "a75a6cdf-ea63-4dea-af63-4cc3bf7305ac"
     },
-    "fileId": "603ncGs8tJtLkzf2bbCoHx",
+    "fileId": "b8flTZWitN8p9roK+C+91N",
     "sync": false
   },
   {
@@ -1462,9 +1477,6 @@
       "__id__": 2
     },
     "spinDirection": 1,
-    "_tilePrefab": {
-      "__uuid__": "a75a6cdf-ea63-4dea-af63-4cc3bf7305ac"
-    },
     "_id": ""
   },
   {
