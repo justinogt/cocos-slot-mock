@@ -16,8 +16,18 @@ export default class GameManager extends cc.Component {
   @property({ type: cc.AudioClip })
   audioClick = null;
 
+  private chance = [];
+  private percentage7 = [];
+  private percentage10 = [];
+  private percentage33 = [];
+
   start() {
     this.machine.createMachine();
+
+    for (let i = 0; i < 50; i++) this.chance.push(i);
+    this.percentage7 = this.chance.slice(0, 7);
+    this.percentage10 = this.chance.slice(7, 17);
+    this.percentage33 = this.chance.slice(17, 50);
   }
 
   async click() {
@@ -46,7 +56,6 @@ export default class GameManager extends cc.Component {
 
   async getAnswer(): Promise<Array<Array<number>>> {
     const getReelsResult = (lines: number[]) => {
-      console.log(lines);
       const tiles = [
         CharactersResource.instance.getRandomIndex(),
         CharactersResource.instance.getRandomIndex(),
@@ -61,19 +70,19 @@ export default class GameManager extends cc.Component {
     }
 
     return await atomicRoutine(1000 + 500 * Math.random(), () => {
-      const rnd = Math.random();
+      const rnd = randomInteger(0, 100);
 
-      if (rnd <= 0.07)
+      if (this.percentage7.indexOf(rnd) !== -1)
         return getReelsResult([0, 1, 2]);
 
-      if (rnd <= 0.1) {
+      if (this.percentage10.indexOf(rnd) !== -1) {
         const lines = [0, 1, 2];
         lines.splice(randomInteger(0, 3), 1);
         return getReelsResult(lines);
       }
 
-      if (rnd <= 0.33)
-        return getReelsResult([0, 2]);
+      if (this.percentage33.indexOf(rnd) !== -1)
+        return getReelsResult([randomInteger(0, 3)]);
 
       return [];
     });
